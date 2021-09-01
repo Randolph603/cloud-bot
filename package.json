@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "node-fetch": "^2.6.1",
     "wechaty": "^0.68.1",
     "wechaty-plugin-contrib": "^0.14.23",
     "wechaty-puppet-xp": "^0.4.16"
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.5.12",
     "@types/node": "^16.4.4",
     "cross-env": "^7.0.3",
     "nodemon": "^2.0.12",
