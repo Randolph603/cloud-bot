@@ -2,6 +2,7 @@ import { Message, Wechaty, log, FileBox } from 'wechaty';
 import { EventLogger, QRCodeTerminal } from 'wechaty-plugin-contrib';
 import { PuppetXp } from 'wechaty-puppet-xp';
 import aiTalk from './components/botTalk';
+import scheduleTask from './components/scheduleTask';
 
 const puppet = new PuppetXp();
 const bot = new Wechaty({
@@ -70,9 +71,9 @@ bot.on('message', onMessage);
 // });
 
 bot.start()
-  .then(() => {
+  .then(async () => {
     log.info('StarterBot', 'Starter Bot Started.');
-
+    await scheduleTask(bot);
   })
   .catch(e => log.error('StarterBot', e));
 
