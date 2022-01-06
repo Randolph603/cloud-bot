@@ -2,26 +2,20 @@ import { Message, Wechaty, log, FileBox, Contact } from 'wechaty';
 import { EventLogger, QRCodeTerminal } from 'wechaty-plugin-contrib';
 import { PuppetXp } from 'wechaty-puppet-xp';
 import aiTalk from './components/botTalk';
+import { replyPlayer, startIdiomsTrain } from './components/idiomsTrain';
 import scheduleTask from './components/scheduleTask';
-import idioms from './configs/idiom.json';
 
-export interface Idiom {
-  derivation: string;
-  example: string;
-  explanation: string;
-  pinyin: string;
-  word: string;
-  abbreviation: string;
-};
-
-const setting = { idioms: false, counter: 10 };
-
-const getRandomInt = (max: number): number => {
-  return Math.floor(Math.random() * max);
-}
+const featureList = [
+  {
+    name: '成语接龙',
+    enable: true,
+    setting: {}
+  }
+]
 
 const puppet = new PuppetXp();
 const bot = new Wechaty({ name: 'cloud-bot', puppet });
+
 // use plugins
 bot.use(QRCodeTerminal({ small: true }));
 bot.use(EventLogger());
@@ -31,60 +25,25 @@ bot.on('message', async (msg: Message) => {
 
   const text = msg.text();
   const room = msg.room();
-  const talker = msg.talker();
-  const idiomList = idioms as Idiom[];
-
-  // const alias = await talker.alias();
-  // console.info(alias);
+  const talker = msg.talker();  
+  // const alias = await talker.alias();  
 
   if (room) {
-    // Ignore self talk
-    if (msg.self()) {
-      console.log('this message is sent by myself!');
-      return;
-    }
+    if (msg.self()) { return; }
 
-    if (setting.idioms === true) {
-      const lastWord = text.slice(-1);
-
-      const nextIdiom = idiomList.filter(i => i.word[0] === lastWord);
-      if (nextIdiom.length > 0) {
-        const n = getRandomInt(nextIdiom.length);
-        await room.say(nextIdiom[n].word);
-        setting.counter = 31;
-      } else {
-        await room.say('你赢了');
-        setting.idioms = false;
-        setting.counter = 0;
-      }
-    }
+    await replyPlayer(room, text);
 
     // When at bot next...
     const contactList = await msg.mentionList();
     if (contactList.some((c: Contact) => c.self())) {
       if (text.includes('功能')) {
         await room.say(`指令列表[Smile][Ruthless]：\n1. 成语接龙`, talker);
-      }
-
-      if (text.includes('成语接龙') && setting.idioms === false) {
-        const n = getRandomInt(idiomList.length);
-        await room.say(idiomList[n].word);
-        setting.idioms = true;
-        setting.counter = 31;
-
-        const timeCountdown = setInterval(async () => {
-          setting.counter--;
-          if (setting.counter === 0) {
-            if (setting.idioms === true) {
-              await room.say("你输了!!");
-              setting.idioms = false;
-            }
-            clearInterval(timeCountdown);
-          } else if ([30, 15, 5].some(n => n === setting.counter)) {
-            await room.say(`还有${setting.counter}秒！`);
-          }
-
-        }, 1000);
+      } else if (text.includes('成语接龙')) {
+        await startIdiomsTrain(room);
+      } else {
+        const commond = text.replace(`@小白云`, '').trim();
+        const content = await aiTalk(commond);
+        await room.say(content, talker);
       }
     }
 
@@ -129,6 +88,7 @@ bot.on('message', async (msg: Message) => {
 bot.start()
   .then(async () => {
     log.info('StarterBot', 'Starter Bot Started.');
+    log.info('Settings: ', JSON.stringify(setting));
     // await scheduleTask(bot);
   })
   .catch(e => log.error('StarterBot', e));
