@@ -1,5 +1,5 @@
 import { Idiom } from "src/model/Idiom";
-import idioms from 'src/configs/idiom.json';
+import idioms from '../configs/idiom.json';
 import { Room } from "wechaty";
 
 const setting = { start: false, counter: 30 };

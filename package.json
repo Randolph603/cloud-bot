@@ -13,9 +13,9 @@
   "dependencies": {
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
-    "wechaty": "^0.68.1",
-    "wechaty-plugin-contrib": "^0.14.23",
-    "wechaty-puppet-xp": "^0.7.15"
+    "wechaty": "^1.10.4",
+    "wechaty-plugin-contrib": "^1.0.18",
+    "wechaty-puppet-xp": "^1.10.2"
   },
   "devDependencies": {
     "@types/node": "^16.4.4",

@@ -1,8 +1,9 @@
-import { Message, Wechaty, log, FileBox, Contact } from 'wechaty';
+import { Message, WechatyBuilder, log, Contact } from 'wechaty';
 import { EventLogger, QRCodeTerminal } from 'wechaty-plugin-contrib';
 import { PuppetXp } from 'wechaty-puppet-xp';
 import aiTalk from './components/botTalk';
 import { replyPlayer, startIdiomsTrain } from './components/idiomsTrain';
+import { welcomeNewMember } from './components/roomFunction';
 import scheduleTask from './components/scheduleTask';
 
 const featureList = [
@@ -14,24 +15,28 @@ const featureList = [
 ]
 
 const puppet = new PuppetXp();
-const bot = new Wechaty({ name: 'cloud-bot', puppet });
+const bot = WechatyBuilder.build({
+  name: 'cloud-bot',
+  puppet,
+});
 
 // use plugins
 bot.use(QRCodeTerminal({ small: true }));
-bot.use(EventLogger());
+// bot.use(EventLogger());
 
 bot.on('message', async (msg: Message) => {
-  console.info('Get Message: ', JSON.stringify(msg));
+  log.info('Get Message: ', JSON.stringify(msg));
 
   const text = msg.text();
   const room = msg.room();
-  const talker = msg.talker();  
+  const talker = msg.talker();
   // const alias = await talker.alias();  
 
   if (room) {
     if (msg.self()) { return; }
 
-    await replyPlayer(room, text);
+    await replyPlayer(room, text);    
+    await welcomeNewMember(bot, msg);   
 
     // When at bot next...
     const contactList = await msg.mentionList();
@@ -54,12 +59,6 @@ bot.on('message', async (msg: Message) => {
     //   if (c) {
     //     await msg.forward(c)
     //   }
-    // }
-
-    // if (text.includes(`@小白云`)) {
-    //   const commond = text.replace(`@小白云`, '').trim();
-    //   const content = await aiTalk(commond);
-    //   await room.say(content, talker);
     // }
   }
 
@@ -88,8 +87,7 @@ bot.on('message', async (msg: Message) => {
 bot.start()
   .then(async () => {
     log.info('StarterBot', 'Starter Bot Started.');
-    log.info('Settings: ', JSON.stringify(setting));
     // await scheduleTask(bot);
   })
-  .catch(e => log.error('StarterBot', e));
+  .catch((e: any) => log.error('StarterBot', e));
 
