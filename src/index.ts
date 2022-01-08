@@ -47,7 +47,7 @@ bot.on('message', async (msg: Message) => {
       } else if (text.includes('成语接龙')) {
         await startIdiomsTrain(room);
       } else if (text.includes('p')) {       
-        const fileBox1 = FileBox.fromUrl('src/images/1.jpg');
+        const fileBox1 = FileBox.fromUrl('https://raw.githubusercontent.com/Randolph603/cloud-bot/main/src/images/1.jpg');
         await msg.say(fileBox1);
       } else {
         const commond = text.replace(`@小白云`, '').trim();
@@ -55,24 +55,8 @@ bot.on('message', async (msg: Message) => {
         await room.say(content, talker);
       }
     }
-
-  }
-
-
-  // if (msg.text() === 'p') {
-  //   const fileBox1 = FileBox.fromUrl('http://pic.linecg.com/uploads/file/contents/2019/095d7772e8a0b1b.jpg')
-  //   await msg.say(fileBox1)
-  // }
-
-  // if (msg.text() === 'c') {
-  //   const contactList = await bot.Contact.findAll()
-  //   console.debug(contactList)
-  // }
-
-  // if (msg.text() === 'r') {
-  //   const roomList = await bot.Room.findAll()
-  //   console.debug(roomList)
-  // }
+  }  
+  
 });
 
 
