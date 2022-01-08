@@ -1,4 +1,5 @@
 import { Message, WechatyBuilder, log, Contact } from 'wechaty';
+import { FileBox } from 'file-box'
 import { EventLogger, QRCodeTerminal } from 'wechaty-plugin-contrib';
 import { PuppetXp } from 'wechaty-puppet-xp';
 import aiTalk from './components/botTalk';
@@ -35,8 +36,8 @@ bot.on('message', async (msg: Message) => {
   if (room) {
     if (msg.self()) { return; }
 
-    await replyPlayer(room, text);    
-    await welcomeNewMember(bot, msg);   
+    await replyPlayer(room, text);
+    await welcomeNewMember(bot, msg);
 
     // When at bot next...
     const contactList = await msg.mentionList();
@@ -45,6 +46,9 @@ bot.on('message', async (msg: Message) => {
         await room.say(`指令列表[Smile][Ruthless]：\n1. 成语接龙`, talker);
       } else if (text.includes('成语接龙')) {
         await startIdiomsTrain(room);
+      } else if (text.includes('p')) {       
+        const fileBox1 = FileBox.fromUrl('src/images/1.jpg');
+        await msg.say(fileBox1);
       } else {
         const commond = text.replace(`@小白云`, '').trim();
         const content = await aiTalk(commond);
@@ -52,14 +56,6 @@ bot.on('message', async (msg: Message) => {
       }
     }
 
-    // const member =await room.memberAll(name)
-    // console.debug('member-------------------------------',member)
-    // if (msg.text() === 'f') {
-    //   const c = await bot.Contact.find({ id: 'tyutluyc' })
-    //   if (c) {
-    //     await msg.forward(c)
-    //   }
-    // }
   }
 
 
