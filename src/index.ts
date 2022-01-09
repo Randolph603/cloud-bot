@@ -11,7 +11,10 @@ const featureList = [
   {
     name: '成语接龙',
     enable: true,
-    setting: {}
+  },
+  {
+    name: '看图猜成语',
+    enable: true,
   }
 ]
 
@@ -43,19 +46,20 @@ bot.on('message', async (msg: Message) => {
     const contactList = await msg.mentionList();
     if (contactList.some((c: Contact) => c.self())) {
       if (text.includes('功能')) {
-        await room.say(`指令列表[Smile][Ruthless]：\n1. 成语接龙`, talker);
-      } else if (text.includes('成语接龙')) {
+        const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
+        await room.say(`指令列表[Smile][Ruthless]：\n` + features, talker);
+      } else if (text.includes(featureList[0].name) && featureList[0].enable === true) {
         await startIdiomsTrain(room);
-      } else if (text.includes('p')) {       
-        const fileBox1 = FileBox.fromUrl('https://raw.githubusercontent.com/Randolph603/cloud-bot/main/src/images/puzzle/1.png');
-        await msg.say(fileBox1);     
+      } else if (text.includes('p')) {
+        const fileBox1 = FileBox.fromUrl('https://raw.githubusercontent.com/Randolph603/cloud-bot/main/src/images/puzzle/1.jpeg');
+        await msg.say(fileBox1);
       } else {
         const commond = text.replace(`@小白云`, '').trim();
         const content = await aiTalk(commond);
         await room.say(content, talker);
       }
     }
-  }  
+  }
 
 });
 
