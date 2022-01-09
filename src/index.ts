@@ -47,8 +47,8 @@ bot.on('message', async (msg: Message) => {
       } else if (text.includes('成语接龙')) {
         await startIdiomsTrain(room);
       } else if (text.includes('p')) {       
-        const fileBox1 = FileBox.fromUrl('https://raw.githubusercontent.com/Randolph603/cloud-bot/main/src/images/1.jpg');
-        await msg.say(fileBox1);
+        const fileBox1 = FileBox.fromUrl('https://raw.githubusercontent.com/Randolph603/cloud-bot/main/src/images/puzzle/1.png');
+        await msg.say(fileBox1);     
       } else {
         const commond = text.replace(`@小白云`, '').trim();
         const content = await aiTalk(commond);
@@ -56,7 +56,7 @@ bot.on('message', async (msg: Message) => {
       }
     }
   }  
-  
+
 });
 
 

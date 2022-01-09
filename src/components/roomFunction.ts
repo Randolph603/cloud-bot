@@ -9,7 +9,7 @@ const welcomeNewMember = async (bot: Wechaty, msg: Message): Promise<void> => {
     if (msg.type() === type.Message.Unknown && talker.id === 'null' && text.includes('加入了群聊')) {
         const newMemberName = text.substring(text.lastIndexOf("邀请") + 3, text.lastIndexOf("加入了群聊") - 1);
         console.log('newMemberName: ' + newMemberName);
-        const newMember = await bot.Contact.find(newMemberName);
+        const newMember = await bot.Contact.findAll({ name: newMemberName });
         console.log('newMember: ' + JSON.stringify(newMember));
         if (newMember && room) {
             // https://emojipedia.org/wechat/
@@ -17,7 +17,8 @@ const welcomeNewMember = async (bot: Wechaty, msg: Message): Promise<void> => {
                 + `群里羽毛球活动目前暂水平无差别活动，希望参加的成员彼此照顾。使用群内程序报名。\n`
                 + `疫情期间，请群友们不打球在场下尽量带好口罩[KeepFighting]，参加活动请带好疫苗证书。\n`
                 + `请不要在群里乱发广告，可以乱发红包[Packet]，请勿直接添加群成员，我们是有爱的小集体!`;
-            await room.say(content, newMember);
+
+            await room.say(content, ...newMember);
         }
     }
 };
