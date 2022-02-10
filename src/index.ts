@@ -50,7 +50,10 @@ bot.on('message', async (msg: Message) => {
         await room.say(`指令列表[Smile][Ruthless]：\n` + features, talker);
       } else if (text.includes(featureList[0].name) && featureList[0].enable === true) {
         await startIdiomsTrain(room);
+      } else if (text.includes(featureList[1].name) && featureList[1].enable === true) {
+        // await startIdiomsTrain(room);
       } else if (text.includes('p')) {
+        // https://m.sohu.com/a/447946680_661362/?pvid=000115_3w_a
         const fileBox1 = FileBox.fromUrl('https://raw.githubusercontent.com/Randolph603/cloud-bot/main/src/images/puzzle/1.jpeg');
         await msg.say(fileBox1);
       } else {
