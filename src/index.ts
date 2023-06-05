@@ -74,7 +74,7 @@ bot.on('message', async (msg: Message) => {
 bot.start()
   .then(async () => {
     log.info('StarterBot', 'Starter Bot Started.');
-    // await scheduleTask(bot);
+    await scheduleTask(bot);
   })
   .catch((e: any) => log.error('StarterBot', e));
 
