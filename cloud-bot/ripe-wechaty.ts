@@ -13,6 +13,7 @@ import qrcodeTerminal from 'qrcode-terminal'
 import timersPromise from 'timers/promises'
 import { welcomeNewMember } from './components/roomFunction.js'
 import { WechatyImpl } from 'wechaty/impls'
+import gptTalk from './components/botGpt.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -55,7 +56,7 @@ function onLogout(user: Contact) {
 async function onMessage(msg: Message) {
   log.info('StarterBot', msg.toString());
   if (msg.self()) { return; }
-     
+
   const text = msg.text();
   const room = msg.room();
   const talker = msg.talker();
@@ -73,54 +74,35 @@ async function onMessage(msg: Message) {
   // When at bot next...
   if (room && [roomTestId].includes(room.id)) {
     // const contactList = await msg.mentionList();             
-    if (text.includes('@小白云')) {      
-      if (text.includes('功能列表')) {        
+    if (text.includes('@小白云')) {
+      if (text.includes('功能列表')) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
         await room.say(`功能列表[Smile][Ruthless]：\n` + features, talker);
+      } else {
+        const commond = text.replace(`@小白云`, '').trim();
+        const content = await gptTalk(commond);
+        await room.say(content, talker);
+
+        const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
+        await room.say(fileBox)
       }
     }
   }
 
   if (room && [roomTestId].includes(room.id)) {
-    if (msg.text() === 'ding') {
+    if (text === 'ding') {
       await msg.say('dong')
     }
-    if (msg.type() === types.Message.Image) {
-      const img = await msg.toImage()
-      const thumbFile = await img.thumbnail()
-      log.info('thumbFile', thumbFile.name)
-      await thumbFile.toFile(`${process.cwd()}/cache/${thumbFile.name}`, true)
-
-      // await timersPromise.setTimeout(3000)
-      // console.info(img)
-      const hdFile = await img.hd()
-      log.info('hdFile', hdFile.name)
-      await hdFile.toFile(`${process.cwd()}/cache/${hdFile.name}`, true)
-      // setTimeout(msg.wechaty.wrapAsync(
-      //   async function () {
-      //     const imginfo = await msg.toFileBox()
-      //     console.info(imginfo)
-      //   },
-      // ), 500)
+    if (text === 'image') {
+      const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
+      await room.say(fileBox)
     }
-    if (msg.type() === types.Message.Emoticon) {
-      const emoticon = await msg.toFileBox()
-      await emoticon.toFile(`${process.cwd()}/cache/${emoticon.name}`, true)
-      await timersPromise.setTimeout(1000)
-      console.info(emoticon)
-      // setTimeout(msg.wechaty.wrapAsync(
-      //   async function () {
-      //     const imginfo = await msg.toFileBox()
-      //     console.info(imginfo)
-      //   },
-      // ), 500)
-    }
-    if (msg.text() === 'file') {
-      const newpath = 'C:\\Users\\wechaty\\Documents\\GitHub\\wechat-openai-qa-bot\\cache\\data1652178575294.xls'
+    if (text === 'file') {
+      const newpath = 'https://www.cmu.edu/blackboard/files/evaluate/tests-example.xls'
 
       log.info('newpath==================================', newpath)
       const fileBox = FileBox.fromFile(newpath)
-      await msg.say(fileBox)
+      await room.say(fileBox)
     }
   }
 }

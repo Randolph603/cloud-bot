@@ -68,6 +68,7 @@
   },
   "dependencies": {
     "cuid": "^2.1.8",
+    "openai": "^3.3.0",
     "sidecar": "^0.17.8",
     "xml2js": "^0.4.23",
     "xmlreader": "^0.2.3"
