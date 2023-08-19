@@ -14,6 +14,7 @@ import timersPromise from 'timers/promises'
 import { welcomeNewMember } from './components/roomFunction.js'
 import { WechatyImpl } from 'wechaty/impls'
 import gptTalk from './components/botGpt.js'
+import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -73,7 +74,7 @@ async function onMessage(msg: Message) {
 
   // When at bot next...
   if (room && [roomTestId].includes(room.id)) {
-    // const contactList = await msg.mentionList();             
+    // const contactList = await msg.mentionList();
     if (text.includes('@小白云')) {
       if (text.includes('功能列表')) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
@@ -86,6 +87,14 @@ async function onMessage(msg: Message) {
         const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
         await room.say(fileBox)
       }
+
+      if (text.includes('抽签')) {
+        tellMeFortune(room, talker);
+      }
+      if (text.includes('解签')) {
+        explainWhy(room, talker);
+      }
+
     }
   }
 
