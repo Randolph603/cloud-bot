@@ -13,7 +13,7 @@ import qrcodeTerminal from 'qrcode-terminal'
 import timersPromise from 'timers/promises'
 import { welcomeNewMember } from './components/roomFunction.js'
 import { WechatyImpl } from 'wechaty/impls'
-import gptTalk, { gptCreateImage } from './components/botGpt.js'
+import { gptTalk, gptCreateImage } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
@@ -85,6 +85,10 @@ async function onMessage(msg: Message) {
         const content = await gptCreateImage(command);
         const fileBox = FileBox.fromUrl(content)
         await room.say(fileBox);
+      } if (text.includes('咨询：')) {
+        const command = text.replace(`@小白云`, '').replace(`咨询：`, '').trim();
+        const content = await gptTalk(command);
+        await room.say(content, talker);
       } else {
         const command = text.replace(`@小白云`, '').trim();
         const content = await gptTalk(command);
