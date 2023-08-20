@@ -10,9 +10,15 @@ const tellMeFortune = async (room: Room, talker: Contact): Promise<void> => {
     const talkerId = talker.id
     if (talkerId) {
         const today = new Date().toLocaleDateString();
-        const existingToday = historyCache.find(h => h.id === talkerId && h.date === today);
-        if (existingToday) {
-            await room.say(existingToday.fortuneTelling.signature, talker);
+        const existingTodayIndex = historyCache.findIndex(h => h.id === talkerId && h.date === today);
+        if (existingTodayIndex > 0) {
+            const existingToday = historyCache.at(existingTodayIndex);            
+            const content = `您抽到了第${existingTodayIndex}签!\n`
+                + '-----------------\n'
+                + `🎐签诗：${existingToday?.fortuneTelling.signature}\n`
+                + '-----------------\n'
+                + '需要解签请回复【小白云 解签】';
+            await room.say(content, talker);            
         } else {
             const rndInt = Math.floor(Math.random() * itemList.length) + 1;
             const fortuneTelling = itemList[rndInt];
