@@ -80,12 +80,12 @@ async function onMessage(msg: Message) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
         await room.say(`功能列表[Smile][Ruthless]：\n` + features, talker);
       } else {
-        const commond = text.replace(`@小白云`, '').trim();
-        const content = await gptTalk(commond);
-        await room.say(content, talker);
+        // const commond = text.replace(`@小白云`, '').trim();
+        // const content = await gptTalk(commond);
+        // await room.say(content, talker);
 
-        const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
-        await room.say(fileBox)
+        // const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
+        // await room.say(fileBox)
       }
 
       if (text.includes('抽签')) {

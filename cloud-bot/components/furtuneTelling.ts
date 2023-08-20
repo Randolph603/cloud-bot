@@ -1,5 +1,5 @@
 import { Contact, Room } from 'wechaty';
-import items from '../configs/fortuneTelling.json';
+import items from '../configs/fortuneTelling.json' assert { type: "json" };
 import { FortuneTelling } from '../model/fortuneTelling';
 
 const historyCache: { id: string, date: string, fortuneTelling: FortuneTelling }[] = [];
