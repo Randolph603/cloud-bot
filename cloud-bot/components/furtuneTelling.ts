@@ -28,7 +28,7 @@ const explainWhy = async (room: Room, talker: Contact): Promise<void> => {
         const today = new Date().toLocaleDateString();
         const existingToday = historyCache.find(h => h.id === talkerId && h.date === today);
         if (existingToday) {
-            await room.say(existingToday.fortuneTelling.untick1, talker);
+            await room.say(existingToday.fortuneTelling.untick2, talker);
         } else{
             await room.say("请先抽签", talker);
         }

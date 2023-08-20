@@ -13,7 +13,7 @@ import qrcodeTerminal from 'qrcode-terminal'
 import timersPromise from 'timers/promises'
 import { welcomeNewMember } from './components/roomFunction.js'
 import { WechatyImpl } from 'wechaty/impls'
-import gptTalk from './components/botGpt.js'
+import gptTalk, { gptCreateImage } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
@@ -72,6 +72,27 @@ async function onMessage(msg: Message) {
     await welcomeNewMember(bot as WechatyImpl, msg);
   }
 
+  if (room && [roomTestId, roomGameId].includes(room.id)) {
+    if (text.includes('@小白云')) {
+      if (text.includes('抽签')) {
+        tellMeFortune(room, talker);
+      }
+      if (text.includes('解签')) {
+        explainWhy(room, talker);
+      }
+      if (text.includes('画图：')) {
+        const command = text.replace(`@小白云`, '').replace(`画图：`, '').trim();
+        const content = await gptCreateImage(command);
+        const fileBox = FileBox.fromUrl(content)
+        await room.say(fileBox);
+      } else {
+        const command = text.replace(`@小白云`, '').trim();
+        const content = await gptTalk(command);
+        await room.say(content, talker);
+      }
+    }
+  }
+
   // When at bot next...
   if (room && [roomTestId].includes(room.id)) {
     // const contactList = await msg.mentionList();
@@ -79,22 +100,7 @@ async function onMessage(msg: Message) {
       if (text.includes('功能列表')) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
         await room.say(`功能列表[Smile][Ruthless]：\n` + features, talker);
-      } else {
-        // const commond = text.replace(`@小白云`, '').trim();
-        // const content = await gptTalk(commond);
-        // await room.say(content, talker);
-
-        // const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
-        // await room.say(fileBox)
       }
-
-      if (text.includes('抽签')) {
-        tellMeFortune(room, talker);
-      }
-      if (text.includes('解签')) {
-        explainWhy(room, talker);
-      }
-
     }
   }
 
