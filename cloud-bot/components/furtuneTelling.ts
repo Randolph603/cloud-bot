@@ -19,9 +19,9 @@ const tellMeFortune = async (room: Room, talker: Contact): Promise<void> => {
             historyCache.push({ id: talkerId, date: today, fortuneTelling });
 
             const content = `您抽到了第${rndInt}签!\n`
-                + '-----------------'
+                + '-----------------\n'
                 + `🎐签诗：${fortuneTelling.signature}\n`
-                + '-----------------'
+                + '-----------------\n'
                 + '需要解签请回复【小白云 解签】';
             await room.say(content, talker);
         }
@@ -35,7 +35,7 @@ const explainWhy = async (room: Room, talker: Contact): Promise<void> => {
         const existingToday = historyCache.find(h => h.id === talkerId && h.date === today);
         if (existingToday) {
             const content = ''
-                + '\n-----------------'
+                + '\n-----------------\n'
                 + `🎐解签：${existingToday.fortuneTelling.untick2}`;
             await room.say(content, talker);
         } else {
