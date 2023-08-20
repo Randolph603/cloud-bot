@@ -1,5 +1,5 @@
 import { Configuration, OpenAIApi } from 'openai';
-const key = '';
+const key = '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';
 
 const gptTalk = async (text: string): Promise<string> => {
     const configuration = new Configuration({
@@ -9,7 +9,7 @@ const gptTalk = async (text: string): Promise<string> => {
 
     const chatCompletion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        max_tokens: 5,
+        max_tokens: 1024,
         messages: [{ "role": "system", "content": text }],
     });
 
@@ -27,7 +27,7 @@ const gptTextTalk = async (text: string): Promise<string> => {
     const chatCompletion = await openai.createCompletion({
         model: "text-davinci-003",
         prompt: text,
-        max_tokens: 7,
+        max_tokens: 1024,
         temperature: 0
     });
 
@@ -45,7 +45,7 @@ const gptCreateImage = async (text: string): Promise<string> => {
     const response = await openai.createImage({
         prompt: text,
         n: 1,
-        size: "1024x1024",
+        size: "256x256",
     });
 
     return response.data.data[0].url ?? '';

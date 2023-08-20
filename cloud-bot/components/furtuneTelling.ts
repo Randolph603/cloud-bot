@@ -17,7 +17,13 @@ const tellMeFortune = async (room: Room, talker: Contact): Promise<void> => {
             const rndInt = Math.floor(Math.random() * itemList.length) + 1;
             const fortuneTelling = itemList[rndInt];
             historyCache.push({ id: talkerId, date: today, fortuneTelling });
-            await room.say(fortuneTelling.signature, talker);
+
+            const content = `您抽到了第${rndInt}签!\n`
+                + '-----------------'
+                + `🎐签诗：${fortuneTelling.signature}\n`
+                + '-----------------'
+                + '需要解签请回复【小白云 解签】';
+            await room.say(content, talker);
         }
     }
 }
@@ -28,8 +34,11 @@ const explainWhy = async (room: Room, talker: Contact): Promise<void> => {
         const today = new Date().toLocaleDateString();
         const existingToday = historyCache.find(h => h.id === talkerId && h.date === today);
         if (existingToday) {
-            await room.say(existingToday.fortuneTelling.untick2, talker);
-        } else{
+            const content = ''
+                + '\n-----------------'
+                + `🎐解签：${existingToday.fortuneTelling.untick2}`;
+            await room.say(content, talker);
+        } else {
             await room.say("请先抽签", talker);
         }
     }

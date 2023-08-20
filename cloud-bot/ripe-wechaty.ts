@@ -13,7 +13,7 @@ import qrcodeTerminal from 'qrcode-terminal'
 import timersPromise from 'timers/promises'
 import { welcomeNewMember } from './components/roomFunction.js'
 import { WechatyImpl } from 'wechaty/impls'
-import { gptTalk, gptCreateImage } from './components/botGpt.js'
+import { gptTalk, gptCreateImage, gptTextTalk } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
@@ -23,12 +23,24 @@ const roomTestId = '44056108246@chatroom' // 测试群
 const featureList = [
   {
     name: '成语接龙',
-    enable: true,
+    enable: false,
   },
   {
     name: '看图猜成语',
+    enable: false,
+  },
+  {
+    name: '小白云，抽签 解签',
     enable: true,
-  }
+  }, 
+  {
+    name: '小白云，画图： XXXXX',
+    enable: true,
+  },
+  {
+    name: '小白云，咨询： XXXXX',
+    enable: true,
+  },
 ]
 
 function onScan(qrcode: string, status: ScanStatus) {
@@ -73,40 +85,33 @@ async function onMessage(msg: Message) {
   }
 
   if (room && [roomTestId, roomGameId].includes(room.id)) {
-    if (text.includes('@小白云')) {
-      if (text.includes('抽签')) {
-        tellMeFortune(room, talker);
-      }
-      if (text.includes('解签')) {
-        explainWhy(room, talker);
-      }
-      if (text.includes('画图：')) {
-        const command = text.replace(`@小白云`, '').replace(`画图：`, '').trim();
-        const content = await gptCreateImage(command);
-        const fileBox = FileBox.fromUrl(content)
-        await room.say(fileBox);
-      } if (text.includes('咨询：')) {
-        const command = text.replace(`@小白云`, '').replace(`咨询：`, '').trim();
-        const content = await gptTalk(command);
-        await room.say(content, talker);
-      } else {
-        const command = text.replace(`@小白云`, '').trim();
-        const content = await gptTalk(command);
-        await room.say(content, talker);
-      }
-    }
-  }
-
-  // When at bot next...
-  if (room && [roomTestId].includes(room.id)) {
-    // const contactList = await msg.mentionList();
-    if (text.includes('@小白云')) {
+    if (text.includes('小白云')) {
       if (text.includes('功能列表')) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
         await room.say(`功能列表[Smile][Ruthless]：\n` + features, talker);
+      } else if (text.includes('抽签')) {
+        tellMeFortune(room, talker);
+      } else if (text.includes('解签')) {
+        explainWhy(room, talker);
+      }
+      else if (text.includes('画图：')) {
+        const command = text.replace(`小白云`, '').replace(`画图`, '').trim();
+        await room.say("正在制作中。。。", talker);
+        const content = await gptCreateImage(command);
+        const fileBox = FileBox.fromUrl(content)
+        await room.say(fileBox);
+      } else if (text.includes('咨询：')) {
+        const command = text.replace(`小白云`, '').replace(`咨询`, '').trim();
+        const content = await gptTextTalk(command);
+        await room.say(content, talker);
+      // }
+      } else {
+        const command = text.replace(`小白云`, '').trim();
+        const content = await gptTalk(command);
+        await room.say(content, talker);
       }
     }
-  }
+  }  
 
   if (room && [roomTestId].includes(room.id)) {
     if (text === 'ding') {
