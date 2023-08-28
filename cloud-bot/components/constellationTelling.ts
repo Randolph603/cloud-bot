@@ -19,7 +19,7 @@ const constellationTelling = async (text: string, room: Room, talker: Contact): 
         summary: string,
     };
 
-    const content = `======${data.name} 今日运势 ======\n`
+    const content = `===${data.name} 今日运势 ===\n`
     + '-----------------\n'
     + `综合运势：${data.all}%\n`
     + `爱情运势：${data.love}%\n`
