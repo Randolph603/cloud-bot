@@ -15,6 +15,7 @@ import { welcomeNewMember } from './components/roomFunction.js'
 import { WechatyImpl } from 'wechaty/impls'
 import { gptTalk, gptCreateImage, gptTextTalk } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
+import constellationTelling from './components/constellationTelling.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -30,15 +31,19 @@ const featureList = [
     enable: false,
   },
   {
-    name: '小白云，抽签 解签',
-    enable: true,
-  }, 
-  {
-    name: '小白云，画图： XXXXX',
+    name: '小白云 抽签 解签',
     enable: true,
   },
   {
-    name: '小白云，咨询： XXXXX',
+    name: '小白云 运势 白羊座',
+    enable: true,
+  },
+  {
+    name: '小白云 画图： XXXXX',
+    enable: true,
+  },
+  {
+    name: '小白云 咨询： XXXXX',
     enable: true,
   },
 ]
@@ -70,6 +75,12 @@ async function onMessage(msg: Message) {
   log.info('StarterBot', msg.toString());
   if (msg.self()) { return; }
 
+  const roomGame = await bot.Room.find({ id: roomGameId });
+  const allMember = await roomGame?.memberAll();
+  if (allMember) {
+    // console.log(JSON.stringify(allMember));
+  }
+
   const text = msg.text();
   const room = msg.room();
   const talker = msg.talker();
@@ -93,8 +104,10 @@ async function onMessage(msg: Message) {
         tellMeFortune(room, talker);
       } else if (text.includes('解签')) {
         explainWhy(room, talker);
-      }
-      else if (text.includes('画图：')) {
+      } else if (text.includes('运势')) {
+        const command = text.replace(`小白云`, '').replace(`运势`, '').trim();
+        await constellationTelling(command, room, talker)
+      } else if (text.includes('画图：')) {
         const command = text.replace(`小白云`, '').replace(`画图`, '').trim();
         await room.say("正在制作中。。。", talker);
         const content = await gptCreateImage(command);
@@ -104,14 +117,14 @@ async function onMessage(msg: Message) {
         const command = text.replace(`小白云`, '').replace(`咨询`, '').trim();
         const content = await gptTextTalk(command);
         await room.say(content, talker);
-      // }
+        // }
       } else {
         const command = text.replace(`小白云`, '').trim();
         const content = await gptTalk(command);
         await room.say(content, talker);
       }
     }
-  }  
+  }
 
   if (room && [roomTestId].includes(room.id)) {
     if (text === 'ding') {

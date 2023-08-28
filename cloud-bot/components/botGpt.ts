@@ -1,9 +1,8 @@
 import { Configuration, OpenAIApi } from 'openai';
-const key = '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';
 
 const gptTalk = async (text: string): Promise<string> => {
     const configuration = new Configuration({
-        apiKey: key,
+        apiKey: process.env.OPENAI_API_KEY,
     });
     const openai = new OpenAIApi(configuration);
 
