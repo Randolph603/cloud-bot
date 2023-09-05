@@ -16,6 +16,7 @@ import { WechatyImpl } from 'wechaty/impls'
 import { gptTalk, gptCreateImage, gptTextTalk } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 import constellationTelling from './components/constellationTelling.js'
+import { checkInToday, tellMePowerPoints, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -36,6 +37,10 @@ const featureList = [
   },
   {
     name: '小白云 运势 白羊座',
+    enable: true,
+  },
+  {
+    name: '小白云 查询积分',
     enable: true,
   },
   {
@@ -84,11 +89,6 @@ async function onMessage(msg: Message) {
   const text = msg.text();
   const room = msg.room();
   const talker = msg.talker();
-  log.info(JSON.stringify(talker));
-  log.info(talker.id);
-  const aa = Number(talker.id.substring(1)) * new Date().getDate().valueOf();
-  log.info(aa.toString());
-
 
   // new member welcome!!!!
   if (room && [roomTestId, roomHallId].includes(room.id)) {
@@ -106,7 +106,15 @@ async function onMessage(msg: Message) {
         explainWhy(room, talker);
       } else if (text.includes('运势')) {
         const command = text.replace(`小白云`, '').replace(`运势`, '').trim();
-        await constellationTelling(command, room, talker)
+        await constellationTelling(command, room, talker);
+      } else if (text.includes('查询')) {
+        await tellMePowerPoints(room, talker);
+      } else if (text.includes('签到')) {
+        await checkInToday(room, talker);
+      } else if (text.includes('召唤回归')) {
+        if (allMember) {
+          await tellMeWhoShouldReturn(room, allMember);
+        }
       } else if (text.includes('画图：')) {
         const command = text.replace(`小白云`, '').replace(`画图`, '').trim();
         await room.say("正在制作中。。。", talker);

@@ -11,7 +11,7 @@ const tellMeFortune = async (room: Room, talker: Contact): Promise<void> => {
     if (talkerId) {
         const today = new Date().toLocaleDateString();
         const existingToday = historyCache.find(h => h.talkerId === talkerId && h.date === today);
-        if (existingToday) {            
+        if (existingToday) {
             const content = `您抽到了第${existingToday.index}签!\n`
                 + '-----------------\n'
                 + `🎐签诗：${existingToday.fortuneTelling.signature}\n`
