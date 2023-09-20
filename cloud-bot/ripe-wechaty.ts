@@ -16,7 +16,7 @@ import { WechatyImpl } from 'wechaty/impls'
 import { gptTalk, gptCreateImage, gptTextTalk } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 import constellationTelling from './components/constellationTelling.js'
-import { checkInToday, tellMePowerPoints, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
+import { checkInToday, tellMePowerPoints, tellMeWhoIsNew, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -44,11 +44,11 @@ const featureList = [
     enable: true,
   },
   {
-    name: '小白云 画图： XXXXX',
+    name: '小白云 画图 XXXXX',
     enable: true,
   },
   {
-    name: '小白云 咨询： XXXXX',
+    name: '小白云 咨询 XXXXX',
     enable: true,
   },
 ]
@@ -110,12 +110,16 @@ async function onMessage(msg: Message) {
       } else if (text.includes('查询')) {
         await tellMePowerPoints(room, talker);
       } else if (text.includes('签到')) {
-        await checkInToday(room, talker);
+        checkInToday(room, talker);
       } else if (text.includes('召唤回归')) {
         if (allMember) {
           await tellMeWhoShouldReturn(room, allMember);
         }
-      } else if (text.includes('画图：')) {
+      } else if (text.includes('召唤新球友')) {
+        if (allMember) {
+          await tellMeWhoIsNew(room, allMember);
+        }
+      } else if (text.includes('画图')) {
         const command = text.replace(`小白云`, '').replace(`画图`, '').trim();
         await room.say("正在制作中。。。", talker);
         const content = await gptCreateImage(command);
