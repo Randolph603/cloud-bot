@@ -96,8 +96,8 @@ const tellMePowerPoints = async (room: Room, talker: Contact): Promise<void> => 
 }
 
 const tellMeWhoShouldReturn = async (room: Room, allMember: Contact[]): Promise<void> => {
-    // 小衝鋒張呵呵
-    const IdsToIgnore = ['claire1006'];
+    // 小衝鋒張呵呵, Jack
+    const IdsToIgnore = ['claire1006', 'q87924857'];
 
     const allMemberId = allMember.filter(m => !IdsToIgnore.includes(m.id)).map(m => m.id).join(',');
     const wechatAppUsers = await findWechatAppUsers(allMemberId);
