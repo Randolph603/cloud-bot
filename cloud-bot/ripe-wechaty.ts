@@ -6,6 +6,7 @@ import {
   log,
   types,
 } from 'wechaty'
+import * as PUPPET from 'wechaty-puppet'
 import { FileBox } from 'file-box'
 
 import { PuppetXp } from '../src/puppet-xp.js'
@@ -93,7 +94,19 @@ async function onMessage(msg: Message) {
   // new member welcome!!!!
   if (room && [roomTestId, roomHallId].includes(room.id)) {
     await welcomeNewMember(bot as WechatyImpl, msg);
+
+    if (text.includes('抽签')) {
+      tellMeFortune(room, talker);
+    } else if (text.includes('解签')) {
+      explainWhy(room, talker);
+    } else if (text.includes('今日运势')) {
+      const command = text.replace(`小白云`, '').replace(`今日运势`, '').trim();
+      await constellationTelling(command, room, talker);
+    }
   }
+
+  const type = msg.type();
+  if (type !== PUPPET.types.Message.Text) return;
 
   if (room && [roomTestId, roomGameId].includes(room.id)) {
     if (text.includes('小白云')) {
@@ -104,8 +117,8 @@ async function onMessage(msg: Message) {
         tellMeFortune(room, talker);
       } else if (text.includes('解签')) {
         explainWhy(room, talker);
-      } else if (text.includes('运势')) {
-        const command = text.replace(`小白云`, '').replace(`运势`, '').trim();
+      } else if (text.includes('今日运势')) {
+        const command = text.replace(`小白云`, '').replace(`今日运势`, '').trim();
         await constellationTelling(command, room, talker);
       } else if (text.includes('查询')) {
         await tellMePowerPoints(room, talker);

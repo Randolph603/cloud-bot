@@ -69,7 +69,7 @@ const checkInToday = async (room: Room, talker: Contact): Promise<void> => {
                 try {
                     await room.say(content, talker);
                 } catch (e) {
-                    await room.say(`积分：${wechatAppUser.powerPoint + 1}`, talker);
+                    await room.say(content, talker);
                 }
 
             } else {
@@ -96,8 +96,8 @@ const tellMePowerPoints = async (room: Room, talker: Contact): Promise<void> => 
 }
 
 const tellMeWhoShouldReturn = async (room: Room, allMember: Contact[]): Promise<void> => {
-    // 小衝鋒張呵呵, Jack
-    const IdsToIgnore = ['claire1006', 'q87924857'];
+    // 小衝鋒張呵呵, Jack（二胎）, Yilin(手受伤了，12月)， Lucia(受伤，12月), TIA（搬北岸）
+    const IdsToIgnore = ['claire1006', 'q87924857', 'yilin17168', 'qq15661460', 'wxt-0603'];
 
     const allMemberId = allMember.filter(m => !IdsToIgnore.includes(m.id)).map(m => m.id).join(',');
     const wechatAppUsers = await findWechatAppUsers(allMemberId);
