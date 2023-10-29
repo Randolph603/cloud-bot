@@ -16,7 +16,7 @@ const findWechatAppUsers = async (allMemberWechatIds: string): Promise<WechatApp
     const wechatAppUsers = res.result.data as WechatAppUser[];
     if (wechatAppUsers && wechatAppUsers.length > 0) {
         wechatAppUsers.forEach(user => {
-            const latestAtt = user.latestAttCreate ? user.latestAttCreate : user.latestAttUpdate;
+            const latestAtt = user.latestActivityStartTime;
             if (latestAtt) {
                 const fromTodayMilisec = new Date().getTime() - new Date(latestAtt).getTime();
                 user.fromToday = Math.ceil(fromTodayMilisec / (1000 * 60 * 60 * 24));
@@ -26,8 +26,7 @@ const findWechatAppUsers = async (allMemberWechatIds: string): Promise<WechatApp
             } else {
                 user.rejoin = "还一次活动没有参加哦，快来报名加入我们吧！"
             }
-        });
-
+        });        
         return wechatAppUsers;
     } else {
         return [];
@@ -80,7 +79,7 @@ const checkInToday = async (room: Room, talker: Contact): Promise<void> => {
 }
 
 const tellMePowerPoints = async (room: Room, talker: Contact): Promise<void> => {
-    const talkerId = talker.id
+    const talkerId = talker.id;    
     if (talkerId) {
         const wechatAppUsers = await findWechatAppUsers(talkerId);
         if (wechatAppUsers.length > 0) {

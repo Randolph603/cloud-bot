@@ -8,9 +8,8 @@ export interface WechatAppUser {
     gender: number;
     userLevel: number;
     continueWeeklyJoin: number;
-    wechatId: string;    
-    latestAttCreate: string;
-    latestAttUpdate: string;
+    wechatId: string;        
+    latestActivityStartTime: string;
     fromToday: number;
     rejoin: string;
 };
