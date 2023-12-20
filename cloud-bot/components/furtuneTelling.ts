@@ -32,7 +32,7 @@ const tellMeFortune = async (room: Room, talker: Contact): Promise<void> => {
                 await room.say(content.trim(), talker);
             }    
         } catch (error) {
-            await room.say("抽了，但出错了。。。", talker);
+            await room.say("抽了，但出错了。。。,请再试一次。。。", talker);
         }
         
     }

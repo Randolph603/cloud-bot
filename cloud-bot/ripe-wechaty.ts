@@ -17,7 +17,7 @@ import { WechatyImpl } from 'wechaty/impls'
 import { gptTalk, gptCreateImage, gptTextTalk } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 import constellationTelling from './components/constellationTelling.js'
-import { checkInToday, tellMePowerPoints, tellMeWhoIsNew, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
+import { checkInToday, tellMeWhoIsNew, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
 
 const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -120,10 +120,8 @@ async function onMessage(msg: Message) {
       } else if (text.includes('今日运势')) {
         const command = text.replace(`小白云`, '').replace(`今日运势`, '').trim();
         await constellationTelling(command, room, talker);
-      } else if (text.includes('查询')) {
-        await tellMePowerPoints(room, talker);
       } else if (text.includes('签到')) {
-        checkInToday(room, talker);
+        await checkInToday(room, talker);
       } else if (text.includes('召唤回归')) {
         if (allMember) {
           await tellMeWhoShouldReturn(room, allMember);
@@ -138,11 +136,10 @@ async function onMessage(msg: Message) {
         const content = await gptCreateImage(command);
         const fileBox = FileBox.fromUrl(content)
         await room.say(fileBox);
-      } else if (text.includes('咨询：')) {
+      } else if (text.includes('咨询')) {
         const command = text.replace(`小白云`, '').replace(`咨询`, '').trim();
         const content = await gptTextTalk(command);
         await room.say(content, talker);
-        // }
       } else {
         const command = text.replace(`小白云`, '').trim();
         const content = await gptTalk(command);

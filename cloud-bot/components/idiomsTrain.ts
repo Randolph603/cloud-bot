@@ -1,4 +1,4 @@
-import { Idiom } from "src/model/Idiom";
+import { Idiom } from "../model/Idiom";
 import idioms from '../configs/idiom.json';
 import { Room } from "wechaty";
 

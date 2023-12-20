@@ -1,4 +1,4 @@
-import { Contact, Room } from 'wechaty';
+import { Contact, Room, log } from 'wechaty';
 import tcb from '@cloudbase/node-sdk';
 import 'dotenv/config';
 import { WechatAppUser } from '../model/WechatAppUser';
@@ -26,7 +26,7 @@ const findWechatAppUsers = async (allMemberWechatIds: string): Promise<WechatApp
             } else {
                 user.rejoin = "还一次活动没有参加哦，快来报名加入我们吧！"
             }
-        });        
+        });
         return wechatAppUsers;
     } else {
         return [];
@@ -34,64 +34,76 @@ const findWechatAppUsers = async (allMemberWechatIds: string): Promise<WechatApp
 }
 
 const checkInToday = async (room: Room, talker: Contact): Promise<void> => {
-    const talkerId = talker.id
-    if (talkerId) {
+    const talkerId = talker.id;
+    if (!talkerId) return;
+
+    try {
+        log.info('Start check in', '...');
+
+        const wechatAppUsers = await findWechatAppUsers(talkerId);
+        if (wechatAppUsers.length == 0) {
+            await room.say("未找到用户！", talker);
+            return;
+        }
+        const wechatAppUser = wechatAppUsers[0];
+        const userName = (wechatAppUser.displayName?.length ?? 0) > 0 ? wechatAppUser.displayName : wechatAppUser.nickName;
+        log.info('Find wechat user', wechatAppUser);
+
+        const rndInt = Math.floor(Math.random() * array.length);
+        const random = array[rndInt];
+        log.info('Find random', random);
+
         const today = new Date().toLocaleDateString();
         const existingToday = historyCache.find(h => h.talkerId === talkerId && h.date === today);
         if (existingToday) {
-            await room.say("今天已经签过到了。", talker);
+            log.info('existingToday', existingToday);
+
+            const content = `${userName}\n`
+                + '-----------------\n'
+                + `积分 + 1 !\n`
+                + `${random} + 1 !\n`
+                + `积分：${wechatAppUser.powerPoint} \n`
+                + (wechatAppUser.rejoin.length > 0 ? `活动：${wechatAppUser.rejoin} \n` : '')
+                + '-----------------';
+            await room.say(content, talker);            
         } else {
             historyCache.push({ talkerId, date: today });
 
-            const wechatAppUsers = await findWechatAppUsers(talkerId);
-            if (wechatAppUsers.length > 0) {
-                const wechatAppUser = wechatAppUsers[0];
-                await app.callFunction({
-                    name: 'updateRecord', data: {
-                        collection: 'UserProfiles',
-                        where: { wechatId: talkerId },
-                        data: { powerPoint: wechatAppUser.powerPoint + 1, },
-                    }
-                });
+            log.info('First time today');
 
-                const rndInt = Math.floor(Math.random() * array.length);
-                const random = array[rndInt];
-                const content = `${wechatAppUser.displayName.length > 0 ? wechatAppUser.displayName : wechatAppUser.nickName}\n`
+            await app.callFunction({
+                name: 'updateRecord', data: {
+                    collection: 'UserProfiles',
+                    where: { wechatId: talkerId },
+                    data: { powerPoint: wechatAppUser.powerPoint + 1, },
+                }
+            });
+
+            try {
+                const content = `${userName}\n`
                     + '-----------------\n'
                     + `积分 + 1 !\n`
                     + `${random} + 1 !\n`
                     + `积分：${wechatAppUser.powerPoint + 1} \n`
                     + (wechatAppUser.rejoin.length > 0 ? `活动：${wechatAppUser.rejoin} \n` : '')
+                    + '-----------------';
+                await room.say(content, talker);
+            } catch (e) {
+                const content = `${wechatAppUser.displayName.length > 0 ? wechatAppUser.displayName : wechatAppUser.nickName}\n`
                     + '-----------------\n'
-                    + '需要查询请回复[小白云 查询]. ';
+                    + `积分 + 1 !\n`
+                    + `${random} + 1 !\n`
+                    + `积分：${wechatAppUser.powerPoint + 1} \n`
+                    + (wechatAppUser.rejoin.length > 0 ? `活动：${wechatAppUser.rejoin} \n` : '');
 
-                try {
-                    await room.say(content, talker);
-                } catch (e) {
-                    await room.say(content, talker);
-                }
-
-            } else {
-                await room.say("未找到用户！", talker);
+                await room.say(content, talker);
             }
         }
+    } catch (error) {
+        console.log(JSON.stringify(error));
+        await room.say("签到出错了。。。,请再试一次。。。", talker);
     }
-}
 
-const tellMePowerPoints = async (room: Room, talker: Contact): Promise<void> => {
-    const talkerId = talker.id;    
-    if (talkerId) {
-        const wechatAppUsers = await findWechatAppUsers(talkerId);
-        if (wechatAppUsers.length > 0) {
-            const wechatAppUser = wechatAppUsers[0];
-            const content = `${wechatAppUser.displayName.length > 0 ? wechatAppUser.displayName : wechatAppUser.nickName}\n`
-                + '-----------------\n'
-                + `积分：${wechatAppUser.powerPoint}`;
-            await room.say(content.trim(), talker);
-        } else {
-            await room.say("未找到用户！", talker);
-        }
-    }
 }
 
 const tellMeWhoShouldReturn = async (room: Room, allMember: Contact[]): Promise<void> => {
@@ -119,25 +131,26 @@ const tellMeWhoShouldReturn = async (room: Room, allMember: Contact[]): Promise<
 }
 
 const tellMeWhoIsNew = async (room: Room, allMember: Contact[]): Promise<void> => {
-    // 小白云 可乐不加冰 Ethan(老蔡)
-    const IdsToIgnore = ['wxid_3bg0p496426322', 'c19810617', 'wxid_8jh25jbzus9k12'];
+    // 小白云 可乐不加冰 Ethan(老蔡) Hank
+    const IdsToIgnore = ['wxid_3bg0p496426322', 'c19810617', 'wxid_8jh25jbzus9k12', 'wxid_xkd6181cw5s421'];
 
     const allMemberId = allMember.map(m => m.id).join(',');
     const wechatAppUsers = await findWechatAppUsers(allMemberId);
-    const allWechatAppUserIds = wechatAppUsers.map(u => u.wechatId);
+    const allWechatAppUserIds = wechatAppUsers.map(u => u.wechatId);    
     const membersNotLinkToWechatApp = allMember.filter(m => !allWechatAppUserIds.includes(m.id) && !IdsToIgnore.includes(m.id));
-
     console.log(membersNotLinkToWechatApp);
-
+    
+    const allWechatAppUserIdsThatNotCome = wechatAppUsers.filter(u=>!u.latestActivityStartTime).map(u => u.wechatId);
+    const membersNotCome = allMember.filter(m => allWechatAppUserIdsThatNotCome.includes(m.id));
+        
     let content = `新来的球友们，准备好到球场出出汗了吗？或者和群里球友们打个招呼吧\n`;
     content += '-----------------';
 
-    await room.say(content.trim(), ...membersNotLinkToWechatApp);
+    await room.say(content.trim(), ...membersNotLinkToWechatApp.concat(membersNotCome));
 }
 
 export {
     checkInToday,
-    tellMePowerPoints,
     tellMeWhoShouldReturn,
     tellMeWhoIsNew,
 };
