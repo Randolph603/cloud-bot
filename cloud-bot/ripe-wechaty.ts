@@ -122,11 +122,11 @@ async function onMessage(msg: Message) {
         await constellationTelling(command, room, talker);
       } else if (text.includes('签到')) {
         await checkInToday(room, talker);
-      } else if (text.includes('召唤回归')) {
+      } else if (text.includes('摇人打球')) {
         if (allMember) {
           await tellMeWhoShouldReturn(room, allMember);
         }
-      } else if (text.includes('召唤新球友')) {
+      } else if (text.includes('新球友')) {
         if (allMember) {
           await tellMeWhoIsNew(room, allMember);
         }
