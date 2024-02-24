@@ -107,8 +107,8 @@ const checkInToday = async (room: Room, talker: Contact): Promise<void> => {
 }
 
 const tellMeWhoShouldReturn = async (room: Room, allMember: Contact[]): Promise<void> => {
-    // 小衝鋒張呵呵, Jack（二胎）, Yilin(手受伤了，12月)， Lucia(受伤，12月), TIA（搬北岸）
-    const IdsToIgnore = ['claire1006', 'q87924857', 'yilin17168', 'qq15661460', 'wxt-0603'];
+    // 小衝鋒張呵呵, Jack（二胎）, Yilin(手受伤了，12月)， Lucia(受伤，12月), TIA（搬北岸）林丛（北岸）Sandy
+    const IdsToIgnore = ['claire1006', 'q87924857', 'yilin17168', 'qq15661460', 'wxt-0603', 'wxid_0yoya6kh2xxa12', 'wxid_2044610446021'];
 
     const allMemberId = allMember.filter(m => !IdsToIgnore.includes(m.id)).map(m => m.id).join(',');
     const wechatAppUsers = await findWechatAppUsers(allMemberId);
@@ -132,7 +132,7 @@ const tellMeWhoShouldReturn = async (room: Room, allMember: Contact[]): Promise<
 
 const tellMeWhoIsNew = async (room: Room, allMember: Contact[]): Promise<void> => {
     // 小白云 可乐不加冰 Ethan(老蔡) Hank
-    const IdsToIgnore = ['wxid_3bg0p496426322', 'c19810617', 'wxid_8jh25jbzus9k12', 'wxid_xkd6181cw5s421'];
+    const IdsToIgnore = ['wxid_3bg0p496426322', 'c19810617', 'wxid_8jh25jbzus9k12', 'wxid_xkd6181cw5s421', 'wxid_8bro5oma92e121'];
 
     const allMemberId = allMember.map(m => m.id).join(',');
     const wechatAppUsers = await findWechatAppUsers(allMemberId);

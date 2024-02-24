@@ -122,7 +122,7 @@ async function onMessage(msg: Message) {
         await constellationTelling(command, room, talker);
       } else if (text.includes('签到')) {
         await checkInToday(room, talker);
-      } else if (text.includes('摇人打球')) {
+      } else if (text.includes('摇人')) {
         if (allMember) {
           await tellMeWhoShouldReturn(room, allMember);
         }
