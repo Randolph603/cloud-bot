@@ -19,7 +19,7 @@ import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 import constellationTelling from './components/constellationTelling.js'
 import { checkInToday, tellMeWhoIsNew, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
 
-const roomGameId = '49584958391@chatroom' // EABC东羽羽毛球活动群
+const room2024Id = '49584958391@chatroom' // EABC东羽羽毛球2024
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
 const roomTestId = '44056108246@chatroom' // 测试群
 
@@ -81,7 +81,7 @@ async function onMessage(msg: Message) {
   log.info('StarterBot', msg.toString());
   if (msg.self()) { return; }
 
-  const roomGame = await bot.Room.find({ id: roomGameId });
+  const roomGame = await bot.Room.find({ id: room2024Id });
   const allMember = await roomGame?.memberAll();
   if (allMember) {
     // console.log(JSON.stringify(allMember));
@@ -92,23 +92,14 @@ async function onMessage(msg: Message) {
   const talker = msg.talker();
 
   // new member welcome!!!!
-  if (room && [roomTestId, roomHallId].includes(room.id)) {
-    await welcomeNewMember(bot as WechatyImpl, msg);
-
-    if (text.includes('抽签')) {
-      tellMeFortune(room, talker);
-    } else if (text.includes('解签')) {
-      explainWhy(room, talker);
-    } else if (text.includes('今日运势')) {
-      const command = text.replace(`小白云`, '').replace(`今日运势`, '').trim();
-      await constellationTelling(command, room, talker);
-    }
+  if (room && [roomTestId, roomHallId, room2024Id].includes(room.id)) {
+    await welcomeNewMember(bot as WechatyImpl, msg);    
   }
 
   const type = msg.type();
   if (type !== PUPPET.types.Message.Text) return;
 
-  if (room && [roomTestId, roomGameId].includes(room.id)) {
+  if (room && [roomTestId, room2024Id].includes(room.id)) {        
     if (text.includes('小白云')) {
       if (text.includes('功能列表')) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
