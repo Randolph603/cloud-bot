@@ -13,11 +13,11 @@ import { PuppetXp } from '../src/puppet-xp.js'
 import qrcodeTerminal from 'qrcode-terminal'
 import timersPromise from 'timers/promises'
 import { welcomeNewMember } from './components/roomFunction.js'
-import { WechatyImpl } from 'wechaty/impls'
-import { gptTalk, gptCreateImage, gptTextTalk } from './components/botGpt.js'
+import { ContactInterface, WechatyImpl } from 'wechaty/impls'
+import { gptTalk, gptCreateImage } from './components/botGpt.js'
 import { explainWhy, tellMeFortune } from './components/furtuneTelling.js'
 import constellationTelling from './components/constellationTelling.js'
-import { checkInToday, tellMeWhoIsNew, tellMeWhoShouldReturn } from './components/badmintonSearch.js'
+import { checkInToday, tellMeWhoIsNew, tellMeWhoShouldReturn, tellMeWhoContinueMost } from './components/badmintonSearch.js'
 
 const room2024Id = '49584958391@chatroom' // EABC东羽羽毛球2024
 const roomHallId = '44730307924@chatroom' // EABC东羽羽毛球新人活动大厅
@@ -81,25 +81,40 @@ async function onMessage(msg: Message) {
   log.info('StarterBot', msg.toString());
   if (msg.self()) { return; }
 
-  const roomGame = await bot.Room.find({ id: room2024Id });
-  const allMember = await roomGame?.memberAll();
-  if (allMember) {
-    // console.log(JSON.stringify(allMember));
-  }
-
   const text = msg.text();
   const room = msg.room();
   const talker = msg.talker();
 
   // new member welcome!!!!
   if (room && [roomTestId, roomHallId, room2024Id].includes(room.id)) {
-    await welcomeNewMember(bot as WechatyImpl, msg);    
+    await welcomeNewMember(bot as WechatyImpl, msg);
+  }
+
+  let allMember: ContactInterface[] = [];
+  if (room && [room2024Id].includes(room.id)) {
+    const roomGame = await bot.Room.find({ id: room2024Id });
+    const result = await roomGame?.memberAll();
+    allMember = result ?? [];
+  }
+
+  if (room && [roomHallId].includes(room.id)) {
+    const room = await bot.Room.find({ id: roomHallId });
+    const result = await room?.memberAll();
+    allMember = result ?? [];
+  }
+  if (room && [roomTestId].includes(room.id)) {
+    const roomGame = await bot.Room.find({ id: room2024Id });
+    // const room = await bot.Room.find({ id: roomHallId });
+    const result1 = await roomGame?.memberAll();
+    // const result2 = await room?.memberAll();
+    const result2 = [];
+    allMember = (result1 ?? []).concat(result2 ?? []);
   }
 
   const type = msg.type();
   if (type !== PUPPET.types.Message.Text) return;
 
-  if (room && [roomTestId, room2024Id].includes(room.id)) {        
+  if (room && [roomTestId, room2024Id].includes(room.id)) {
     if (text.includes('小白云')) {
       if (text.includes('功能列表')) {
         const features = featureList.filter(f => f.enable === true).map((f, i) => `${i + 1}. ${f.name}`).join('\n');
@@ -121,16 +136,16 @@ async function onMessage(msg: Message) {
         if (allMember) {
           await tellMeWhoIsNew(room, allMember);
         }
+      } else if (text.includes('积极球友')) {
+        if (allMember) {
+          await tellMeWhoContinueMost(room, allMember);
+        }
       } else if (text.includes('画图')) {
         const command = text.replace(`小白云`, '').replace(`画图`, '').trim();
         await room.say("正在制作中。。。", talker);
         const content = await gptCreateImage(command);
         const fileBox = FileBox.fromUrl(content)
         await room.say(fileBox);
-      } else if (text.includes('咨询')) {
-        const command = text.replace(`小白云`, '').replace(`咨询`, '').trim();
-        const content = await gptTextTalk(command);
-        await room.say(content, talker);
       } else {
         const command = text.replace(`小白云`, '').trim();
         const content = await gptTalk(command);

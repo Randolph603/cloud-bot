@@ -1,58 +1,40 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 
 const gptTalk = async (text: string): Promise<string> => {
-    const configuration = new Configuration({
+    const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
     });
-    const openai = new OpenAIApi(configuration);
 
-    const chatCompletion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
+    const chatCompletion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo", //model: "gpt-4o-mini",
         max_tokens: 1024,
-        messages: [{ "role": "system", "content": text }],
-    });
+        messages: [
+            {"role": "user", "content": text}
+        ]
+    });   
 
-    console.log(chatCompletion.data.choices[0].message);
-    const content = chatCompletion.data.choices[0].message?.content ?? '???';
-    return content;
-}
-
-const gptTextTalk = async (text: string): Promise<string> => {
-    const configuration = new Configuration({
-        apiKey: key,
-    });
-    const openai = new OpenAIApi(configuration);
-
-    const chatCompletion = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: text,
-        max_tokens: 1024,
-        temperature: 0
-    });
-
-    console.log(chatCompletion.data.choices[0].text);
-    const content = chatCompletion.data.choices[0].text ?? '???';
+    console.log(chatCompletion.choices[0].message);
+    const content = chatCompletion.choices[0].message?.content ?? '???';
     return content;
 }
 
 const gptCreateImage = async (text: string): Promise<string> => {
-    const configuration = new Configuration({
-        apiKey: key,
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
     });
-    const openai = new OpenAIApi(configuration);
 
-    const response = await openai.createImage({
+    const image = await openai.images.generate({ 
+        model: "dall-e-3", 
         prompt: text,
         n: 1,
         size: "256x256",
-    });
+    });    
 
-    return response.data.data[0].url ?? '';
+    return image.data[0].url ?? '';
 }
 
 
 export {
     gptCreateImage,
-    gptTalk,
-    gptTextTalk
+    gptTalk
 };
